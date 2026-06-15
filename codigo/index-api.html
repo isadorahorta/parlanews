@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ParlaNews | Protótipo de Recuperação da Informação</title>
+  <style>
+    :root {
+      --azul-900: #102a43;
+      --azul-800: #173b63;
+      --azul-700: #1f5f99;
+      --azul-600: #2477b3;
+      --azul-100: #e8f4ff;
+      --cinza-900: #1f2933;
+      --cinza-700: #3e4c59;
+      --cinza-500: #7b8794;
+      --cinza-200: #d9e2ec;
+      --cinza-100: #f5f7fa;
+      --verde: #1f8a70;
+      --vermelho: #b42318;
+      --branco: #ffffff;
+      --sombra: 0 16px 40px rgba(16, 42, 67, 0.12);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #f7fbff 0%, #eef5fb 100%);
+      color: var(--cinza-900);
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--azul-900), var(--azul-700));
+      color: var(--branco);
+      padding: 34px 22px;
+    }
+
+    .container {
+      width: min(1180px, 94%);
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.7);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 24px;
+      background: rgba(255,255,255,.12);
+      letter-spacing: -1px;
+    }
+
+    h1 { margin: 0; font-size: clamp(30px, 4vw, 46px); letter-spacing: -1.5px; }
+    .subtitle { margin: 8px 0 0; color: #dbeafe; font-size: 17px; }
+
+    .badge {
+      border: 1px solid rgba(255,255,255,.35);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 14px;
+      color: #eef7ff;
+      background: rgba(255,255,255,.10);
+    }
+
+    main { padding: 28px 0 54px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel, .result-card, .info-box {
+      background: var(--branco);
+      border: 1px solid var(--cinza-200);
+      border-radius: var(--radius);
+      box-shadow: var(--sombra);
+    }
+
+    .panel { padding: 22px; position: sticky; top: 18px; }
+    .panel h2, .results h2 { margin: 0 0 14px; font-size: 22px; color: var(--azul-900); }
+    .help { color: var(--cinza-700); line-height: 1.55; font-size: 14px; margin: 0 0 18px; }
+
+    label {
+      display: block;
+      margin: 14px 0 7px;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--cinza-900);
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 13px;
+      border: 1px solid var(--cinza-200);
+      border-radius: 12px;
+      font-size: 15px;
+      background: #fff;
+      outline: none;
+    }
+
+    input:focus, select:focus { border-color: var(--azul-600); box-shadow: 0 0 0 3px rgba(36,119,179,.12); }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .actions { display: flex; gap: 10px; margin-top: 18px; }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 14px;
+      cursor: pointer;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .primary { background: var(--azul-700); color: white; flex: 1; }
+    .secondary { background: var(--azul-100); color: var(--azul-800); }
+    .chip-area { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 4px; }
+
+    .chip {
+      background: #eef6ff;
+      border: 1px solid #c8def5;
+      color: var(--azul-800);
+      border-radius: 999px;
+      padding: 8px 10px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .hero-card {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--sombra);
+      border: 1px solid var(--cinza-200);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .hero-card h2 { margin: 0 0 8px; color: var(--azul-900); font-size: 27px; }
+    .hero-card p { margin: 0; line-height: 1.55; color: var(--cinza-700); }
+
+    .profile {
+      display: grid;
+      grid-template-columns: 86px 1fr;
+      gap: 16px;
+      align-items: center;
+      background: linear-gradient(135deg, #ffffff, #eef7ff);
+      border: 1px solid #cfe5fb;
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 20px;
+    }
+
+    .avatar {
+      width: 86px;
+      height: 86px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, var(--azul-700), #6bb9e8);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 32px;
+      font-weight: 900;
+    }
+
+    .profile h3 { margin: 0 0 5px; font-size: 24px; color: var(--azul-900); }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+    .tag { background: white; border: 1px solid #cfe5fb; color: var(--azul-800); border-radius: 999px; padding: 7px 10px; font-size: 13px; font-weight: 700; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 0 0 20px;
+    }
+
+    .stat {
+      background: white;
+      border: 1px solid var(--cinza-200);
+      border-radius: 15px;
+      padding: 16px;
+      box-shadow: 0 8px 22px rgba(16,42,67,.07);
+    }
+    .stat strong { display: block; color: var(--azul-900); font-size: 24px; }
+    .stat span { font-size: 13px; color: var(--cinza-700); }
+
+    .result-card {
+      padding: 18px;
+      margin-bottom: 14px;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .result-card:hover { transform: translateY(-2px); box-shadow: 0 18px 42px rgba(16,42,67,.16); }
+
+    .result-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+    .date { color: var(--cinza-500); font-size: 13px; font-weight: 700; white-space: nowrap; }
+    .result-card h3 { margin: 0 0 8px; font-size: 20px; color: var(--azul-900); }
+    .result-card p { margin: 0 0 12px; color: var(--cinza-700); line-height: 1.5; }
+    .source-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .source { background: #f1f5f9; color: var(--cinza-700); border-radius: 999px; padding: 7px 10px; font-size: 13px; font-weight: 700; }
+    .theme { background: #ecfdf3; color: var(--verde); border-radius: 999px; padding: 7px 10px; font-size: 13px; font-weight: 800; }
+    .score { background: #fff7ed; color: #9a3412; border-radius: 999px; padding: 7px 10px; font-size: 13px; font-weight: 800; }
+
+    .info-box { padding: 20px; margin-top: 22px; }
+    .info-box h2 { margin-top: 0; color: var(--azul-900); }
+    .info-box p { line-height: 1.6; color: var(--cinza-700); }
+    .operator-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .operator { background: var(--cinza-100); border-radius: 14px; padding: 14px; border: 1px solid var(--cinza-200); }
+    .operator strong { color: var(--azul-900); display: block; margin-bottom: 6px; }
+
+    .empty {
+      background: #fff;
+      border: 1px dashed var(--cinza-200);
+      border-radius: var(--radius);
+      padding: 30px;
+      color: var(--cinza-700);
+      text-align: center;
+    }
+
+    @media (max-width: 880px) {
+      .grid { grid-template-columns: 1fr; }
+      .panel { position: static; }
+      .stats, .operator-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 560px) {
+      .row, .stats, .operator-grid { grid-template-columns: 1fr; }
+      .profile { grid-template-columns: 1fr; }
+      .result-top { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container topbar">
+      <div class="brand">
+        <div class="logo">PN</div>
+        <div>
+          <h1>ParlaNews</h1>
+          <p class="subtitle">Informação pública conectada à sociedade</p>
+        </div>
+      </div>
+      <div class="badge">Protótipo acadêmico | Recuperação da Informação</div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero-card">
+      <h2>Modelo de Recuperação da Informação</h2>
+      <p>Este protótipo demonstra como a aplicação permite recuperar notícias associadas a parlamentares por meio de busca textual, filtros por metadados, operadores lógicos e ordenação dos resultados. Os dados são simulados para fins acadêmicos.</p>
+    </section>
+
+    <div class="grid">
+      <aside class="panel">
+        <h2>Busca e filtros</h2>
+        <p class="help">Digite uma consulta ou use os exemplos. A recuperação considera nome, resumo, tema, partido, estado, fonte e data.</p>
+
+        <label for="query">Consulta</label>
+        <input id="query" type="text" value="Erika Hilton" placeholder="Ex.: Erika Hilton AND educação" />
+
+        <div class="chip-area">
+          <button class="chip" data-query="Erika Hilton">Erika Hilton</button>
+          <button class="chip" data-query="Erika Hilton AND educação">AND educação</button>
+          <button class="chip" data-query="Erika Hilton OR saúde">OR saúde</button>
+          <button class="chip" data-query="Erika Hilton NOT economia">NOT economia</button>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="cargo">Cargo</label>
+            <select id="cargo">
+              <option value="">Todos</option>
+              <option value="Deputada Federal">Deputada Federal</option>
+              <option value="Senadora">Senadora</option>
+            </select>
+          </div>
+          <div>
+            <label for="partido">Partido</label>
+            <select id="partido">
+              <option value="">Todos</option>
+              <option value="PSOL">PSOL</option>
+              <option value="PT">PT</option>
+              <option value="MDB">MDB</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="estado">Estado</label>
+            <select id="estado">
+              <option value="">Todos</option>
+              <option value="SP">SP</option>
+              <option value="MG">MG</option>
+              <option value="BA">BA</option>
+            </select>
+          </div>
+          <div>
+            <label for="tema">Tema</label>
+            <select id="tema">
+              <option value="">Todos</option>
+              <option value="Educação">Educação</option>
+              <option value="Saúde">Saúde</option>
+              <option value="Direitos Humanos">Direitos Humanos</option>
+              <option value="Economia">Economia</option>
+              <option value="Tecnologia">Tecnologia</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="fonte">Fonte</label>
+        <select id="fonte">
+          <option value="">Todas</option>
+          <option value="Agência Câmara">Agência Câmara</option>
+          <option value="G1 Política">G1 Política</option>
+          <option value="Senado Notícias">Senado Notícias</option>
+          <option value="Brasil de Fato">Brasil de Fato</option>
+        </select>
+
+        <label for="ordenacao">Ordenação</label>
+        <select id="ordenacao">
+          <option value="recente">Mais recente</option>
+          <option value="antigo">Mais antigo</option>
+          <option value="relevancia">Maior relevância</option>
+        </select>
+
+        <label class="api-toggle" for="usar-reais" style="display:flex;align-items:center;gap:10px;margin-top:14px;font-weight:600;cursor:pointer;">
+          <input type="checkbox" id="usar-reais" />
+          Consumir APIs reais (Câmara, Senado, GNews)
+        </label>
+        <p class="help" style="margin-top:6px;">Desligado: usa os dados simulados da apresentação. Ligado: consulta as APIs (requer chave do GNews em <code>api.js</code>).</p>
+
+        <div class="actions">
+          <button class="primary" id="buscar">Pesquisar</button>
+          <button class="secondary" id="limpar">Limpar</button>
+        </div>
+      </aside>
+
+      <section class="results">
+        <div class="profile" id="profile"></div>
+        <div id="api-status" class="help" style="min-height:0;"></div>
+        <div class="stats" id="stats"></div>
+        <h2>Resultados recuperados</h2>
+        <div id="results"></div>
+
+        <div class="info-box">
+          <h2>Como o item 4.1 é demonstrado</h2>
+          <p>A aplicação simula um sistema de recuperação da informação com busca simples, busca avançada, filtros por metadados descritivos e temáticos, operadores booleanos e ordenação por data ou relevância.</p>
+          <div class="operator-grid">
+            <div class="operator"><strong>AND</strong>Recupera registros que contenham todos os termos pesquisados.</div>
+            <div class="operator"><strong>OR</strong>Recupera registros que contenham pelo menos um dos termos.</div>
+            <div class="operator"><strong>NOT</strong>Exclui registros que contenham o termo indicado.</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="api.js"></script>
+  <script>
+    const noticias = [
+      { parlamentar: 'Erika Hilton', cargo: 'Deputada Federal', partido: 'PSOL', estado: 'SP', tema: 'Educação', fonte: 'Agência Câmara', data: '2026-06-05', relevancia: 98, titulo: 'Erika Hilton defende ampliação de políticas educacionais em audiência pública', resumo: 'A deputada participou de debate sobre acesso à educação, permanência estudantil e transparência em políticas públicas.' },
+      { parlamentar: 'Erika Hilton', cargo: 'Deputada Federal', partido: 'PSOL', estado: 'SP', tema: 'Direitos Humanos', fonte: 'G1 Política', data: '2026-06-01', relevancia: 94, titulo: 'Parlamentares discutem propostas de proteção social no Congresso', resumo: 'Erika Hilton aparece entre os nomes citados em debate sobre direitos humanos, cidadania e políticas públicas.' },
+      { parlamentar: 'Erika Hilton', cargo: 'Deputada Federal', partido: 'PSOL', estado: 'SP', tema: 'Saúde', fonte: 'Brasil de Fato', data: '2026-05-28', relevancia: 88, titulo: 'Deputada cobra ações de saúde pública para população vulnerável', resumo: 'A notícia relaciona a atuação parlamentar com iniciativas de acesso à saúde e atendimento humanizado.' },
+      { parlamentar: 'Erika Hilton', cargo: 'Deputada Federal', partido: 'PSOL', estado: 'SP', tema: 'Economia', fonte: 'G1 Política', data: '2026-05-21', relevancia: 71, titulo: 'Comissão debate orçamento e impactos sociais de medidas econômicas', resumo: 'A parlamentar é mencionada em discussão sobre orçamento público, economia e desigualdade social.' },
+      { parlamentar: 'Erika Hilton', cargo: 'Deputada Federal', partido: 'PSOL', estado: 'SP', tema: 'Tecnologia', fonte: 'Agência Câmara', data: '2026-05-17', relevancia: 82, titulo: 'Uso de dados abertos no Legislativo é tema de encontro na Câmara', resumo: 'A reportagem aborda transparência, tecnologia cívica e organização da informação pública.' },
+      { parlamentar: 'Tabata Amaral', cargo: 'Deputada Federal', partido: 'PSB', estado: 'SP', tema: 'Educação', fonte: 'Agência Câmara', data: '2026-05-30', relevancia: 85, titulo: 'Tabata Amaral participa de debate sobre ensino básico', resumo: 'A parlamentar defende indicadores para acompanhamento da educação pública.' },
+      { parlamentar: 'Margarida Salomão', cargo: 'Deputada Federal', partido: 'PT', estado: 'MG', tema: 'Educação', fonte: 'G1 Política', data: '2026-05-18', relevancia: 77, titulo: 'Deputada mineira debate financiamento da educação', resumo: 'Discussão envolve universidades, ensino básico e políticas federais.' },
+      { parlamentar: 'Eliziane Gama', cargo: 'Senadora', partido: 'MDB', estado: 'MA', tema: 'Direitos Humanos', fonte: 'Senado Notícias', data: '2026-05-12', relevancia: 74, titulo: 'Senadora participa de comissão sobre direitos sociais', resumo: 'A notícia destaca atividades legislativas e propostas em tramitação.' }
+    ];
+
+    const $ = id => document.getElementById(id);
+
+    function normalizar(texto) {
+      return (texto || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function textoBusca(item) {
+      return normalizar(`${item.parlamentar} ${item.cargo} ${item.partido} ${item.estado} ${item.tema} ${item.fonte} ${item.titulo} ${item.resumo}`);
+    }
+
+    function aplicarBooleano(items, consulta) {
+      const q = consulta.trim();
+      if (!q) return items;
+      const upper = q.toUpperCase();
+
+      if (upper.includes(' AND ')) {
+        const termos = q.split(/\s+AND\s+/i).map(normalizar);
+        return items.filter(item => termos.every(t => textoBusca(item).includes(t)));
+      }
+      if (upper.includes(' OR ')) {
+        const termos = q.split(/\s+OR\s+/i).map(normalizar);
+        return items.filter(item => termos.some(t => textoBusca(item).includes(t)));
+      }
+      if (upper.includes(' NOT ')) {
+        const [incluir, excluir] = q.split(/\s+NOT\s+/i).map(normalizar);
+        return items.filter(item => textoBusca(item).includes(incluir) && !textoBusca(item).includes(excluir));
+      }
+      const termo = normalizar(q);
+      return items.filter(item => textoBusca(item).includes(termo));
+    }
+
+    function setStatus(msg, tipo) {
+      const el = $('api-status');
+      if (!el) return;
+      el.textContent = msg || '';
+      el.style.color = tipo === 'erro' ? 'var(--vermelho)'
+                     : tipo === 'ok'  ? 'var(--verde)'
+                     : 'var(--cinza-500)';
+    }
+
+    async function pesquisar() {
+      const usarReais = $('usar-reais') && $('usar-reais').checked;
+      let dados;
+
+      if (usarReais) {
+        $('buscar').disabled = true;
+        setStatus('Consultando APIs (Câmara, Senado, GNews)…');
+        try {
+          const r = await ParlaNewsAPI.carregarNoticias($('query').value, { ordenacao: $('ordenacao').value });
+          dados = r.resultados;
+          if (!dados.length) {
+            setStatus('As APIs não retornaram notícias. Verifique a chave do GNews e o CORS em api.js. Exibindo dados simulados.', 'erro');
+            dados = [...noticias];
+          } else {
+            setStatus(`Dados recuperados das APIs reais — ${dados.length} notícia(s).`, 'ok');
+          }
+        } catch (e) {
+          setStatus('Falha ao consultar as APIs (' + e.message + '). Exibindo dados simulados.', 'erro');
+          dados = [...noticias];
+        } finally {
+          $('buscar').disabled = false;
+        }
+      } else {
+        dados = [...noticias];
+        setStatus('Modo demonstração: dados simulados.');
+      }
+
+      dados = aplicarBooleano(dados, $('query').value);
+
+      ['cargo', 'partido', 'estado', 'tema', 'fonte'].forEach(campo => {
+        const valor = $(campo).value;
+        if (valor) dados = dados.filter(item => item[campo] === valor);
+      });
+
+      const ordem = $('ordenacao').value;
+      dados.sort((a,b) => {
+        if (ordem === 'antigo') return new Date(a.data) - new Date(b.data);
+        if (ordem === 'relevancia') return b.relevancia - a.relevancia;
+        return new Date(b.data) - new Date(a.data);
+      });
+
+      renderizar(dados);
+    }
+
+    function formatarData(data) {
+      if (!data) return 's/ data';
+      const d = new Date(data + 'T12:00:00');
+      return isNaN(d) ? 's/ data' : d.toLocaleDateString('pt-BR');
+    }
+
+    function renderizar(dados) {
+      const principal = dados[0] || noticias[0];
+      $('profile').innerHTML = `
+        <div class="avatar">${principal.parlamentar.split(' ').map(p => p[0]).slice(0,2).join('')}</div>
+        <div>
+          <h3>${principal.parlamentar}</h3>
+          <div class="meta">
+            <span class="tag">${principal.cargo}</span>
+            <span class="tag">${principal.partido}</span>
+            <span class="tag">${principal.estado}</span>
+          </div>
+          <p class="help">Perfil recuperado a partir dos metadados parlamentares. As notícias abaixo são ordenadas conforme os critérios definidos na busca.</p>
+        </div>
+      `;
+
+      const temas = new Set(dados.map(d => d.tema));
+      const fontes = new Set(dados.map(d => d.fonte));
+      $('stats').innerHTML = `
+        <div class="stat"><strong>${dados.length}</strong><span>resultados</span></div>
+        <div class="stat"><strong>${temas.size}</strong><span>temas</span></div>
+        <div class="stat"><strong>${fontes.size}</strong><span>fontes</span></div>
+        <div class="stat"><strong>${dados[0] ? formatarData(dados[0].data) : '-'}</strong><span>mais recente</span></div>
+      `;
+
+      if (!dados.length) {
+        $('results').innerHTML = '<div class="empty">Nenhum resultado recuperado. Ajuste a consulta ou remova algum filtro.</div>';
+        return;
+      }
+
+      $('results').innerHTML = dados.map(item => `
+        <article class="result-card">
+          <div class="result-top">
+            <h3>${item.url ? `<a href="${item.url}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">${item.titulo}</a>` : item.titulo}</h3>
+            <span class="date">${formatarData(item.data)}</span>
+          </div>
+          <p>${item.resumo}</p>
+          <div class="source-row">
+            <span class="source">${item.fonte}</span>
+            <span class="theme">${item.tema}</span>
+            <span class="score">relevância ${item.relevancia}%</span>
+            <span class="source">${item.parlamentar} · ${item.partido}-${item.estado}</span>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    document.querySelectorAll('.chip').forEach(btn => {
+      btn.addEventListener('click', () => { $('query').value = btn.dataset.query; pesquisar(); });
+    });
+    $('buscar').addEventListener('click', pesquisar);
+    $('limpar').addEventListener('click', () => {
+      $('query').value = 'Erika Hilton';
+      ['cargo','partido','estado','tema','fonte'].forEach(id => $(id).value = '');
+      $('ordenacao').value = 'recente';
+      pesquisar();
+    });
+    ['cargo','partido','estado','tema','fonte','ordenacao'].forEach(id => $(id).addEventListener('change', pesquisar));
+    if ($('usar-reais')) $('usar-reais').addEventListener('change', pesquisar);
+    $('query').addEventListener('keydown', e => { if (e.key === 'Enter') pesquisar(); });
+
+    pesquisar();
+  </script>
+</body>
+</html>
